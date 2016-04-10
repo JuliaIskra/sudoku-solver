@@ -54,8 +54,8 @@
         col (* y 3)]
     (flatten (map
               (fn [r] (map
-                       (fn [c] (index r c)
-                         (range col (+ col 3)))))
+                       (fn [c] (index r c))
+                       (range col (+ col 3))))
               (range row (+ row 3))))))
 
 (defn squares-indexes
@@ -76,36 +76,27 @@
 
 (defn unique?
   [numbers]
-  (apply distinct? numbers))
-
-(defn unique-rows?
-  [field]
-  (reduce #(and %1 %2)
-          true
-          (map unique? (rows field))))
-
-(defn unique-cols?
-  [field]
-  (reduce #(and %1 %2)
-          true
-          (map unique? (cols field))))
-
-(defn unique-squares?
-  [field]
-  (reduce #(and %1 %2)
-          true
-          (map unique? (squares field))))
+  (and (apply distinct? numbers)
+       (not (some nil? numbers))))
 
 (defn correct?
   [field]
-  (and (unique-rows? field)
-       (unique-cols? field)
-       (unique-squares? field)))
+  (and (every? unique? (rows field))
+       (every? unique? (cols field))
+       (every? unique? (squares field))))
 
-(defn insert
-  "Inserts a number into specified cell in a field"
-  [field row col number]
-  (assoc field (index row col) number))
+(defn first-empty-index
+  [field]
+  (first (keep-indexed (fn [i n] (if (= n nil) i nil)) field)))
+
+(defn compute
+  [field]
+  (loop [next-field field
+         number     1]
+    (if (or (correct? next-field) (> number 9))
+      next-field
+      (recur (assoc field (first-empty-index field) number)
+             (inc number)))))
 
 (defn -main
   [& args]
