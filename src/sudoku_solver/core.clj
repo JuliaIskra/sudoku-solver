@@ -20,7 +20,7 @@
 
 (defn to-field
   [numbers]
-  (map read-string (s/split numbers #"")))
+  (replace {(read-string ".") nil} (map read-string (s/split numbers #""))))
 
 (defn index
   [row col]
@@ -76,8 +76,8 @@
 
 (defn unique?
   [numbers]
-  (and (apply distinct? numbers)
-       (not (some nil? numbers))))
+  ; todo here could be no arguments
+  (apply distinct? (remove nil? numbers)))
 
 (defn correct?
   [field]
@@ -85,18 +85,36 @@
        (every? unique? (cols field))
        (every? unique? (squares field))))
 
+(defn correct-and-without-nil?
+  [field]
+  (and (correct? field)
+       (not (some nil? field))))
+
 (defn first-empty-index
   [field]
   (first (keep-indexed (fn [i n] (if (= n nil) i nil)) field)))
 
 (defn compute
   [field]
-  (loop [next-field field
-         number     1]
+  (loop [prev-field    field
+         current-field field
+         empty-index   (first-empty-index field)
+         number        1]
     (cond
-      (correct? next-field) next-field
+      (correct-and-without-nil? current-field) current-field
+
       (> number 9) "can't find solution"
-      :else (recur (assoc field (first-empty-index field) number)
+
+      (and (correct? current-field)
+           (not= (first-empty-index current-field) empty-index))
+      (recur current-field
+             current-field
+             (first-empty-index current-field)
+             1)
+
+      :else (recur prev-field
+                   (assoc prev-field empty-index number)
+                   empty-index
                    (inc number)))))
 
 (defn -main
