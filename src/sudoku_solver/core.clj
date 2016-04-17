@@ -93,10 +93,11 @@
   [field]
   (loop [next-field field
          number     1]
-    (if (or (correct? next-field) (> number 9))
-      next-field
-      (recur (assoc field (first-empty-index field) number)
-             (inc number)))))
+    (cond
+      (correct? next-field) next-field
+      (> number 9) "can't find solution"
+      :else (recur (assoc field (first-empty-index field) number)
+                   (inc number)))))
 
 (defn -main
   [& args]
