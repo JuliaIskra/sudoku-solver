@@ -15,9 +15,6 @@
 ; 63 64 65  66 67 68  69 70 71
 ; 72 73 74  75 76 77  78 79 80
 
-; 174385962293467158586192734451923876928674315367851249719548623635219487842736591
-; 17438596229346715858619273445192387692867431536785124971954862363521948784273659.
-
 (defn to-field
   [numbers]
   (replace {(read-string ".") nil} (map read-string (s/split numbers #""))))
@@ -75,9 +72,11 @@
    (squares-indexes)))
 
 (defn unique?
-  [numbers]
-  ; todo here could be no arguments
-  (apply distinct? (remove nil? numbers)))
+  [input]
+  (let [numbers (remove nil? input)]
+    (if (empty? numbers)
+      true
+      (apply distinct? numbers))))
 
 (defn correct?
   [field]
@@ -100,6 +99,11 @@
          current-field field
          empty-index   (first-empty-index field)
          number        1]
+    ;(prn "prev-field:   " prev-field)
+    ;(prn "current-field:" current-field)
+    ;(prn "empty-index:  " empty-index)
+    ;(prn "number:       " number)
+    ;(prn "--------------------------")
     (cond
       (correct-and-without-nil? current-field) current-field
 
