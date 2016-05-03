@@ -93,33 +93,18 @@
   [field]
   (first (keep-indexed (fn [i n] (if (= n nil) i nil)) field)))
 
+(defn compute-recursive
+  [field number empty-index]
+  (let [new-empty-index (first-empty-index field)]
+    (cond
+      (correct-and-without-nil? field) field
+      (> number 9) nil
+      (and (correct? field) (not= new-empty-index empty-index)) (compute-recursive field 1 new-empty-index)
+      :else (compute-recursive (assoc field empty-index number) (inc number) empty-index))))
+
 (defn compute
   [field]
-  (loop [prev-field    field
-         current-field field
-         empty-index   (first-empty-index field)
-         number        1]
-    ;(prn "prev-field:   " prev-field)
-    ;(prn "current-field:" current-field)
-    ;(prn "empty-index:  " empty-index)
-    ;(prn "number:       " number)
-    ;(prn "--------------------------")
-    (cond
-      (correct-and-without-nil? current-field) current-field
-
-      (> number 9) "can't find solution"
-
-      (and (correct? current-field)
-           (not= (first-empty-index current-field) empty-index))
-      (recur current-field
-             current-field
-             (first-empty-index current-field)
-             1)
-
-      :else (recur prev-field
-                   (assoc prev-field empty-index number)
-                   empty-index
-                   (inc number)))))
+  (compute-recursive field 1 (first-empty-index field)))
 
 (defn -main
   [& args]
