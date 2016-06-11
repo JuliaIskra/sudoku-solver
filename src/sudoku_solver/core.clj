@@ -17,14 +17,14 @@
 
 (defn to-field
   [numbers]
-  (replace {(read-string ".") nil} (map read-string (s/split numbers #""))))
+  (into [] (replace {(read-string ".") nil} (map read-string (s/split numbers #"")))))
 
 (defn index
   [row col]
   (+ (* 9 row) col))
 
 (defn rows
-  "Returns values in rows of a filed"
+  "Returns values in rows of a field"
   [field]
   (partition 9 field))
 
@@ -38,7 +38,7 @@
    (range 9)))
 
 (defn cols
-  "Returns values in cols of a filed"
+  "Returns values in cols of a field"
   [field]
   (map
    (fn [col-indexes] (map (partial get field) col-indexes))
@@ -65,7 +65,7 @@
    (range 3)))
 
 (defn squares
-  "Returns values in squares of a filed"
+  "Returns values in squares of a field"
   [field]
   (map
    (fn [sq-indexes] (map (partial get field) sq-indexes))
@@ -84,27 +84,34 @@
        (every? unique? (cols field))
        (every? unique? (squares field))))
 
-(defn correct-and-without-nil?
-  [field]
-  (and (correct? field)
-       (not (some nil? field))))
-
 (defn first-empty-index
   [field]
   (first (keep-indexed (fn [i n] (if (= n nil) i nil)) field)))
 
-(defn compute-recursive
-  [field number empty-index]
-  (let [new-empty-index (first-empty-index field)]
-    (cond
-      (correct-and-without-nil? field) field
-      (> number 9) nil
-      (and (correct? field) (not= new-empty-index empty-index)) (compute-recursive field 1 new-empty-index)
-      :else (compute-recursive (assoc field empty-index number) (inc number) empty-index))))
-
-(defn compute
+; todo set up profiling
+; todo generate not all possible values but only correct ones
+(defn children
+  "Returns all possible values in the first empty cell"
   [field]
-  (compute-recursive field 1 (first-empty-index field)))
+  (let [index (first-empty-index field)]
+    (if (nil? index)
+      []
+      (map
+       (fn [n] (assoc field index n))
+       (range 1 10)))))
+
+(defn compute-all
+  [field]
+  (let [ch (children field)]
+    (if (empty? ch)
+      [field]
+      (mapcat compute-all (filter correct? ch)))))
+
+(defn compute-first-correct
+  [field]
+  (let [solutions (compute-all field)]
+    (first solutions)))
+
 
 (defn -main
   [& args]
