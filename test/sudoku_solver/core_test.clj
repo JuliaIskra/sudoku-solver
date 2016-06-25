@@ -64,7 +64,7 @@
           6 3 5 2 1 9 4 8 7
           8 4 2 7 3 6 5 9 1])))
 
-; 23s
+; 23s -> 8s
 (deftest solve-hard-sudoku
   (is (= (time (compute-first-correct [1 n n n n n n n 2
                                        n 9 n 4 n n n 5 n
@@ -85,7 +85,7 @@
           6 3 5 2 1 9 4 8 7
           8 4 2 7 3 6 5 9 1])))
 
-; 0.8s
+; 0.8s -> 0.3s
 (deftest solve-hard-sudoku2
   (is (= (time (compute-first-correct [n 8 n 6 n n 3 n n
                                        n n n n n 3 n 8 5
@@ -107,15 +107,15 @@
           8 6 3 7 4 5 2 1 9])))
 
 ;(deftest solve-hardest-sudoku
-;  (is (= (compute-first-correct [n n n n n n n n n
-;                                 n n n n n 3 n 8 5
-;                                 n n 1 n 2 n n n n
-;                                 n n n 5 n 7 n n n
-;                                 n n 4 n n n 1 n n
-;                                 n 9 n n n n n n n
-;                                 5 n n n n n n 7 3
-;                                 n n 2 n 1 n n n n
-;                                 n n n n 4 n n n 9])
+;  (is (= (time (compute-first-correct [n n n n n n n n n
+;                                       n n n n n 3 n 8 5
+;                                       n n 1 n 2 n n n n
+;                                       n n n 5 n 7 n n n
+;                                       n n 4 n n n 1 n n
+;                                       n 9 n n n n n n n
+;                                       5 n n n n n n 7 3
+;                                       n n 2 n 1 n n n n
+;                                       n n n n 4 n n n 9]))
 ;         [9 8 7 6 5 4 3 2 1
 ;          2 4 6 1 7 3 9 8 5
 ;          3 5 1 9 2 8 7 4 6

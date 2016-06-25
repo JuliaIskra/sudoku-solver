@@ -61,17 +61,17 @@
         square-col (quot col-number 3)]
     (square-indexes square-row square-col)))
 
-; todo precalculate related indexes for each index:
-; - vector of distinct sorted vecors or
-; - vector of sotred sets
-(defn related-indexes
+(defn get-related-indexes
   [index]
   (concat (related-row index) (related-col index) (related-square index)))
 
+(def related-indexes
+  (into [] (map (comp (partial into []) sort distinct get-related-indexes) (range 81))))
+
 (defn possible-numbers
   [field index]
-  (let [numbers   (set (range 1 10))]
-    (apply disj numbers (map field (related-indexes index)))))
+  (let [numbers (set (range 1 10))]
+    (apply disj numbers (map field (get related-indexes index)))))
 
 (defn children
   "Returns all possible correct values in the first empty cell"
