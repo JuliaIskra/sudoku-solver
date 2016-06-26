@@ -19,6 +19,7 @@
   [numbers]
   (into [] (replace {(read-string ".") nil} (map read-string (s/split numbers #"")))))
 
+
 (defn index
   [row col]
   (+ (* 9 row) col))
@@ -34,23 +35,42 @@
                        (range col (+ col 3))))
               (range row (+ row 3))))))
 
-(defn first-empty-index
-  [field]
-  (first (keep-indexed (fn [i n] (if (= n nil) i nil)) field)))
+
+(def digit-set
+  (set (range 1 10)))
+
+(def rows
+  "Indexes of numbers in each row"
+  (into [] (map (partial into []) (partition 9 (range 81)))))
+
+(def cols
+  "Indexes of numbers in each column"
+  (into [] (map
+            (fn [col] (into [] (map
+                                (fn [row] (index row col))
+                                (range 9))))
+            (range 9))))
+
+(def squares
+  "Indexes of numbers in each square"
+  (into [] (map (partial into [])
+                (mapcat
+                 (fn [x] (map
+                          (fn [y] (square-indexes x y))
+                          (range 3)))
+                 (range 3)))))
 
 (defn related-row
   "Returns numbers in the same row that indexed number is in"
   [index]
-  (let [row-number  (quot index 9)
-        start-index (* 9 row-number)
-        stop-index  (* 9 (+ row-number 1))]
-    (range start-index stop-index)))
+  (let [row-number  (quot index 9)]
+    (get rows row-number)))
 
 (defn related-col
   "Returns numbers in the same column that indexed number is in"
   [index]
   (let [col-number (mod index 9)]
-    (map #(+ (* 9 %1) col-number) (range 9))))
+    (get cols col-number)))
 
 (defn related-square
   "Returns numbers in the same square that indexed number is in"
@@ -59,7 +79,7 @@
         col-number (mod index 9)
         square-row (quot row-number 3)
         square-col (quot col-number 3)]
-    (square-indexes square-row square-col)))
+    (get squares (+ (* 3 square-row) square-col))))
 
 (defn get-related-indexes
   [index]
@@ -68,10 +88,17 @@
 (def related-indexes
   (into [] (map (comp (partial into []) sort distinct get-related-indexes) (range 81))))
 
+
 (defn possible-numbers
   [field index]
-  (let [numbers (set (range 1 10))]
-    (apply disj numbers (map field (get related-indexes index)))))
+  (let [numbers (transient digit-set)]
+    (persistent! (apply disj! numbers (map field (get related-indexes index))))))
+
+(defn first-empty-index
+  [field]
+  (first (keep-indexed (fn [i n] (if (= n nil) i nil)) field)))
+
+; todo go through each row, col and square and fill only single empty cell in each of them
 
 (defn children
   "Returns all possible correct values in the first empty cell"

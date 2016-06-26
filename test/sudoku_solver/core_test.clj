@@ -64,7 +64,7 @@
           6 3 5 2 1 9 4 8 7
           8 4 2 7 3 6 5 9 1])))
 
-; 23s -> 8s
+; 8s -> 6s
 (deftest solve-hard-sudoku
   (is (= (time (compute-first-correct [1 n n n n n n n 2
                                        n 9 n 4 n n n 5 n
@@ -85,7 +85,7 @@
           6 3 5 2 1 9 4 8 7
           8 4 2 7 3 6 5 9 1])))
 
-; 0.8s -> 0.3s
+; 0.3s
 (deftest solve-hard-sudoku2
   (is (= (time (compute-first-correct [n 8 n 6 n n 3 n n
                                        n n n n n 3 n 8 5
